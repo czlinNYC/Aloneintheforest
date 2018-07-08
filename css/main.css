@@ -106,7 +106,30 @@ h1 { position: absolute;
     width: 160px;
     top: 380px;
     transition: 1s;
+    display: none;
 }
+#enemyHealth {
+    width: 600px;
+    height: 50px;
+    border-radius: 5px;
+    top: 550px;
+    left: 420px;
+    position: absolute;
+    border: solid 2px white;
+    box-shadow: 0px 0px 10px grey;
+}
+#enemyHealthFull{
+    flex: 600;
+    background-color: red;
+    border-radius: 5px 5px 5px 5px;
+}
+#enemyHealthGone{
+    flex:0;
+    background-color: #0c1023;
+    border-radius: 5px 5px 5px 5px;
+
+}
+
 #UIcont{
     position:absolute;
     width: 80vw;
@@ -150,6 +173,9 @@ h1 { position: absolute;
     position: absolute;
     height: 126px;
     width: 1008px;
+}
+.hidden {
+    display: none;
 }
 .plane0 {
     z-index: 0;

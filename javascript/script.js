@@ -29,10 +29,11 @@ class View {
     // enemy variables
     this.enemy = document.querySelector('#enemy');
     this.enemyBox = document.querySelector('#enemyCont');
+    
     this.enemyFaceRight = false;
     this.enemyFrame =0;
     this.enemyCurrentX = 21;
-    this.enemyHealth = 100;
+    this.enemyHealth = 600;
     this.animations = [
       { name: 'walk',
         frames: 8,
@@ -86,6 +87,7 @@ class View {
   buildUI(){
     let UIcont = document.createElement('div');
     UIcont.id ='UIcont';
+    UIcont.classList.add('hidden');
     this.mainContainer.appendChild(UIcont);
     
     let healthBar = document.createElement('div');
@@ -94,6 +96,12 @@ class View {
     healthBar.innerHTML = '<h1>health</h1>';
     healthBar.style.display = 'flex';
     
+    let enemyHealthBar = document.createElement('div');
+    enemyHealthBar.id = 'enemyHealth';
+    this.mainContainer.appendChild(enemyHealthBar);
+    enemyHealthBar.innerHTML = '<h1>Sorceror</h1>';
+    enemyHealthBar.classList.add('hidden');
+
     let moraleBar = document.createElement('div');
     moraleBar.id = 'morale';
     UIcont.appendChild(moraleBar);
@@ -116,6 +124,15 @@ class View {
     for (let i = 0; i < 2; i+=1){
       let newDiv = document.createElement('div');
       if(i=== 0 ){
+        newDiv.id = 'enemyHealthFull';
+      }else {
+        newDiv.id = 'enemyHealthGone';
+      }
+      enemyHealthBar.appendChild(newDiv);
+    }
+    for (let i = 0; i < 2; i+=1){
+      let newDiv = document.createElement('div');
+      if(i=== 0 ){
         newDiv.id = 'moraleFull';
       }else {
         newDiv.id = 'moraleGone';
@@ -126,6 +143,8 @@ class View {
     this.heroHealthFull = document.querySelector('#healthFull');
     this.heroMoraleFull = document.querySelector('#moraleFull');
     this.heroMoraleGone = document.querySelector('#moraleGone');
+    this.enemyHealthFull = document.querySelector('#enemyHealthFull');
+    this.enemyHealthGone = document.querySelector('#enemyHealthGone');
   }
   detailUI(){
     
@@ -253,6 +272,11 @@ class View {
  
  // combat functions   
   enemyAi(mobject){
+    if (this.titleClear === false) {
+      this.enemyCurrentX = 24;
+    } else if(this.titleClear === true) {
+      this.enemyCurrentX = 21;
+    }
     if(this.enemyCurrentX > this.heroCurrentX+1) {
       this.enemyFaceRight =  false;
       this.enemyCurrentX--;
@@ -266,15 +290,18 @@ class View {
     }
     setTimeout(this.runEnemyAnimation.bind(this,mobject),mobject.timing);
   }
+  
   enemyAttack(){
     if (Math.floor(Math.random() * 85)> 15){
       let healthLoss = Math.floor(Math.random() * 12);
         if (this.heroMorale < 150){
           healthLoss *= 2;
+        } if(this.playerDefenseUp === true){
+          healthLoss *= 0.8;
         }
       this.heroHealth -= healthLoss;
       if (this.playerDefenseUp === false) {
-        this.heroMorale -= (Math.floor(Math.random() * 12)*3);
+        this.heroMorale -= (Math.floor(Math.random() * 12)*4);
       }
     }
     this.updateHealth();
@@ -282,10 +309,17 @@ class View {
   playerAttack(){
     if ((this.enemyCurrentX === (this.heroCurrentX + 1) && this.faceLeft === false)||(this.enemyCurrentX === (this.heroCurrentX - 1) && this.faceLeft === true)||(this.enemyCurrentX === this.heroCurrentX)){
       if (Math.floor(Math.random() * 85)> 15){
-        this.enemyHealth -= Math.floor(Math.random() * 12);
+       let healthLoss = Math.floor(Math.random() * 12);
+       if (this.heroMorale > 225){
+        healthLoss *= 2;
+       }
+       if (this.heroHealth < 150){
+         healthLoss *= 2;
+       } 
+        this.enemyHealth -= healthLoss;
         this.heroMorale += (Math.floor(Math.random() * 12)*3);
       }
-      console.log(this.enemyHealth);
+      this.updateHealth();
     }
   }
   defenseDown(){
@@ -301,16 +335,40 @@ class View {
     }
     if( this.heroMorale < 0){
       this.heroMoraleFull.style.flex = 0;  
+    } 
+    if ( this.heroMorale > 300) {
+      this.heroMorale = 300;
     }
+    if( this.enemyHealth < 0){
+      this.enemyHealthFull.style.flex = 0;  
+    }
+    this.enemyHealthFull.style.flex = this.enemyHealth;
+    this.enemyHealthGone.style.flex = 600 - this.enemyHealth;
     this.heroHealthFull.style.flex = this.heroHealth;
     this.heroMoraleFull.style.flex = this.heroMorale;
     this.heroHealthGone.style.flex = 300 - this.heroHealth;
     this.heroMoraleGone.style.flex = 300 - this.heroMorale;
+    console.log(this.heroMorale);
+    this.checkDeath();
+  }
+  checkDeath(){
+    if (this.heroHealth < 0){
+      this.heroBox.remove();
+      clearInterval(this.enemyCombat);
+    }
+    if (this.enemyHealth < 0){
+      this.enemyBox.remove();
+      clearInterval(this.enemyCombat);
+    }
   }
   // user input functions
   clearOut(){
     clearInterval(this.scroll);
     clearTimeout(this.opening);
+    this.enemyBox.style.display = 'block';
+    this.titleClear = 'true';
+    document.querySelector('#enemyHealth').style.display = 'flex';
+    document.querySelector('#UIcont').style.display ='block';
   }  
   moveRight() {
     if (this.heroCurrentX < 21) {
@@ -349,7 +407,6 @@ document.onkeydown = function(e){
           document.querySelector('#start').style.transform = 'translateX(1500px)'; 
       }
     } else if (keycode === 39) {
-      view.clearOut();
       if (view.heroCombatMotion === false) {
       view.moveRight();
       };
@@ -359,7 +416,6 @@ document.onkeydown = function(e){
         view.heroInMotion = true;
       }
   } else if (keycode === 37){
-      view.clearOut();
       if (view.heroCombatMotion === false) {
       view.moveLeft();   
       };
@@ -369,7 +425,6 @@ document.onkeydown = function(e){
         view.heroInMotion = true;
       };
     } else if (keycode === 38){
-      view.clearOut();
       if (view.heroInMotion === false){
         view.runAnimation(view.animations[2]);
         view.heroInMotion = true;
@@ -377,7 +432,6 @@ document.onkeydown = function(e){
         view.playerAttack();
     };
     } else if (keycode === 40){
-      view.clearOut();
       if (view.heroInMotion === false){
         view.runAnimation(view.animations[4]);
         view.heroInMotion = true;
