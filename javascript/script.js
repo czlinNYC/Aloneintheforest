@@ -18,6 +18,8 @@ class View {
     this.maps = 0;
     this.titleClear = false;
     this.heroFrame = 0;
+    this.heroInMotion = false;
+    this.test = false;
     this.animations = [
       { name: 'walk',
         frames: 8,
@@ -109,26 +111,27 @@ class View {
         }
       view.newPos[x][y] = view.newPos[x][y] - this.moveWeights[y];
       this.background[x][y].style.left = view.newPos[x][y] + 'px';
-      }
+      
+    }
     }
   }
   cycleAnimation(mobject){ 
     this.hero.style.left = `-${this.heroFrame  * mobject.width}px`;
     this.heroFrame++;
-    if (this.heroFrame > (mobject.frames - 1)) {
+    if(this.heroFrame < mobject.frames){
+      setTimeout(this.cycleAnimation.bind(this,mobject),mobject.timing);
+    };
+    console.log(this.heroInMotion);
+    if (this.heroFrame > (mobject.frames-1)) {
       this.heroFrame = 0;
+      this.heroInMotion = false;
     }
   } 
-  runWalk(mobject){
+  runAnimation(mobject){
     this.setAnimation(mobject);
-    this.con = setInterval(this.cycleWalk.bind(this),mobject.timing);
+    setTimeout(this.cycleAnimation.bind(this,mobject),mobject.timing);
   }
-  cycleWalk (){
-    this.cycleAnimation(this.animations[0]);
-  }
-  setWalk(){
-    this.setAnimation(this.animations[0]);
-  }
+ 
   setAnimation(mobject){
     this.hero.remove();
     this.heroBox.style.height = `${mobject.height}px`;
@@ -147,25 +150,23 @@ class View {
     //928 is frame width of the parallaxing background
     this.buildBackground(928);
     this.buildUI();
-    this.runWalk(this.animations[0]);
     this.moveWeightsConstruction();
   }
 
   clearOut(){
     clearInterval(this.scroll);
-    clearInterval(this.con);
   }  
   moveRight() {
-    if (this.heroCurrentX < 63) {
+    if (this.heroCurrentX < 21) {
     this.heroCurrentX++;
-    this.heroBox.style.transform = `translateX(${this.heroCurrentX * 21}px)`;
+    this.heroBox.style.transform = `translateX(${this.heroCurrentX * 63}px)`;
   }
   }
   moveLeft() {
     // if (this.heroMoving === false) {
     if (this.heroCurrentX > 0) {
     this.heroCurrentX--;
-    this.heroBox.style.transform = `translateX(${this.heroCurrentX * 21}px)`;
+    this.heroBox.style.transform = `translateX(${this.heroCurrentX * 63}px)`;
     this.hero.style.transform= 'scaleX(-1)';
   }
 }
@@ -181,26 +182,44 @@ document.onkeydown = function(e){
           view.clearOut();
           document.querySelector('#title').style.transform = 'translateX(-1500px)';
           document.querySelector('#start').style.transform = 'translateX(1500px)'; 
-          view.setIdle();
-          view.animate();
+          
           
       }
     } else if (keycode === 39) {
-      document.onkeydown = function(){
       view.clearOut();
-      view.moveRight();
-      view.runWalk(view.animations[0]);
+     
+      if (view.heroInMotion === false){
+        view.moveRight();
+        view.runAnimation(view.animations[0]);
+        view.heroInMotion = true;
+        view.test =true;
       }
   } else if (keycode === 37){
-      document.onkeydown = function(){
       view.clearOut();
-      view.moveLeft();
-      view.runWalk(view.animations[0]);
+      
+      if (view.heroInMotion === false){
+        view.moveLeft();
+        view.runAnimation(view.animations[0]);
+        view.heroInMotion = true;
+        view.test = true;
+      
+      }
+    } else if (keycode === 38){
+      view.clearOut();
+      if (view.heroInMotion === false){
+        view.runAnimation(view.animations[2]);
+        view.heroInMotion = true;
+        view.test = true;
+    }
+    } else if (keycode === 40){
+      view.clearOut();
+      if (view.heroInMotion === false){
+        view.runAnimation(view.animations[4]);
+        view.heroInMotion = true;
+        view.test = true; 
   }
-}
-}
-
-
+    }
+  }
 const view = new View;
 view.render();
  
