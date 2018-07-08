@@ -21,6 +21,11 @@ class View {
     this.test = false;
     this.faceLeft =false;
     // enemy variables
+    this.enemy = document.querySelector('#enemy');
+    this.enemyBox = document.querySelector('#enemyCont');
+    this.enemyFaceRight = false;
+    this.enemyFrame =0;
+    this.enemyCurrentX = 21;
     this.animations = [
       { name: 'walk',
         frames: 8,
@@ -60,7 +65,15 @@ class View {
         timing: 80,
         type: this.heroBox,
         image: this.hero
-      }];
+        
+      },
+      { name: 'sumwalk',
+        frames: 12,
+        width: 160,
+        height: 160,
+        timing: 240
+      }
+    ];
   }
   // building the graphics
   buildUI(){
@@ -110,6 +123,8 @@ class View {
       }
     }
   }
+  detailUI(){
+  }
   // setting the opening animations
   autoScroll() {
     for (let x = 0; x < 3; x += 1){
@@ -123,6 +138,7 @@ class View {
       this.background[x][y].style.left = view.newPos[x][y] + 'px';
       if (this.heroInMotion ===false){
        this.opening = this.runAnimation(this.animations[0]);
+       this.opening2 = this.runEnemyAnimation(this.animations[5]);
         this.heroInMotion = true;
       }
     }
@@ -151,8 +167,8 @@ class View {
  
   setAnimation(mobject){
     this.hero.remove();
-    mobject.type.style.height = `${mobject.height}px`;
-    mobject.type.style.width = `${mobject.width}px`;
+    this.heroBox.style.height = `${mobject.height}px`;
+    this.heroBox.style.width = `${mobject.width}px`;
     this.hero = document.createElement('img');
     this.hero.src = `assets/characterSprite/${mobject.name}.png`;
     this.hero.style.width = `${(mobject.frames) * mobject.width}px`;
@@ -163,9 +179,58 @@ class View {
       this.hero.style.transform= 'scaleX(-1)';
     }
   }
-  detailUI(){
+  // enemy animation functions
+  cycleEnemyAnimation(mobject){ 
+    if (this.enemyFrame < mobject.frames){
+      this.enemyInMotion === true;
+    }
+    this.enemy.style.left = `-${this.enemyFrame  * mobject.width}px`;
+    this.enemyFrame++;
+    if(this.enemyFrame < mobject.frames){
+      setTimeout(this.cycleEnemyAnimation.bind(this,mobject),mobject.timing);
+    };
+    if (this.enemyFrame > (mobject.frames-1)) {
+      this.enemyFrame = 0;
+      this.enemyInMotion = false;
+      // if (mobject.name === 'slash' || 'block') {
+      //   this.enemyCombatMotion = false;
+      // } 
+    }
+  } 
+  runEnemyAnimation(mobject){
+    this.setEnemyAnimation(mobject);
+    setTimeout(this.cycleEnemyAnimation.bind(this,mobject),mobject.timing);
   }
-
+ 
+  setEnemyAnimation(mobject){
+    this.enemy.remove();
+    this.enemyBox.style.height = `${mobject.height}px`;
+    this.enemyBox.style.width = `${mobject.width}px`;
+    this.enemy = document.createElement('img');
+    this.enemy.src = `assets/characterSprite/${mobject.name}.png`;
+    this.enemy.style.width = `${(mobject.frames) * mobject.width}px`;
+    this.enemy.style.position= 'absolute';
+    this.enemy.style.height = `${mobject.height}px`;
+    this.enemyBox.appendChild(this.enemy);
+    if(this.enemyFaceRight === true){
+      this.enemy.style.transform= 'scaleX(-1)';
+    }
+  }
+ 
+    
+  enemyAi(mobject){
+    if(this.enemyCurrentX > this.heroCurrentX+1) {
+      this.enemyFaceRight =  false;
+      this.enemyCurrentX--;
+      this.enemyBox.style.transform = `translateX(${this.enemyCurrentX * 63}px)`;
+    } else if (this.enemyCurrentX < this.heroCurrentX-1) {
+      this.enemyFaceRight = true;
+      this.enemyCurrentX++;
+      this.enemyBox.style.transform = `translateX(${this.enemyCurrentX * 63}px)`;
+    }
+    setTimeout(this.runEnemyAnimation.bind(this,mobject),mobject.timing);
+  }
+  // user input functions
   clearOut(){
     clearInterval(this.scroll);
     clearTimeout(this.opening);
@@ -184,6 +249,7 @@ class View {
 }
 render(){
   this.scroll = setInterval(this.autoScroll.bind(this), 40);
+  this.enemyCombat = setInterval(this.enemyAi.bind(this,this.animations[5]), 720);
   //928 is frame width of the parallaxing background
   this.buildBackground(928);
   this.buildUI();

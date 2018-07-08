@@ -95,6 +95,20 @@ h1 { position: absolute;
     top: 400px;
     transition: 1s;
 }
+#enemy {
+    position: absolute;
+    height: 160px;
+    width: 1920px;
+}
+#enemyCont{
+    position: absolute;
+    z-index: 9;
+    overflow: hidden;
+    height: 160px;
+    width: 160px;
+    top: 380px;
+    transition: 1s;
+}
 #UIcont{
     position:absolute;
     width: 80vw;
