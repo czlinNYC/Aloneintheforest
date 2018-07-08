@@ -93,7 +93,7 @@ h1 { position: absolute;
     height: 126px;
     width: 126px;
     top: 400px;
-    transition: .8s;
+    transition: 1s;
 }
 #UIcont{
     position:absolute;

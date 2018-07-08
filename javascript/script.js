@@ -3,56 +3,66 @@
 // }
 class View {
   constructor (moveIncrement, backWidth, panes){
-    this.moveIncrement = moveIncrement;
-    this.backWidth = backWidth;
-    this.panes = panes;
+    // background variables
     this.background = [];
     this.mainContainer = document.querySelector('#mainContainer');
     this.newPos = [[],[],[]];
     this.moveWeights = [];
     this.width = 928;
+    this.titleClear = false;
+    // hero varibales
     this.frameSkip = 0;
     this.heroBox = document.querySelector('#charContainer');
     this.heroCurrentX = 0;
     this.hero = document.querySelector('#character');
-    this.maps = 0;
-    this.titleClear = false;
     this.heroFrame = 0;
     this.heroInMotion = false;
+    this.heroCombatMotion = false;
     this.test = false;
+    this.faceLeft =false;
+    // enemy variables
     this.animations = [
       { name: 'walk',
         frames: 8,
         width: 126,
         height: 126,
-        timing: 80
+        timing: 80,
+        type: this.heroBox,
+        image: this.hero
       },
       { name: 'idle',
         frames: 4,
         width: 126,
         height: 126,
-        timing: 120
+        timing: 120,
+        type: this.heroBox
       },
       { name: 'slash',
         frames: 10,
         width: 150,
         height: 120,
-        timing: 80
+        timing: 80,
+        type: this.heroBox,
+        image: this.hero
       },
       { name: 'death',
         frames: 9,
         width: 126,
         height: 126,
-        timing: 120
+        timing: 120,
+        type: this.heroBox,
+        image: this.hero
       },
       { name: 'block',
         frames: 7,
         width: 126,
         height: 126,
-        timing: 80
+        timing: 80,
+        type: this.heroBox,
+        image: this.hero
       }];
-
   }
+  // building the graphics
   buildUI(){
     let UIcont = document.createElement('div');
     UIcont.id ='UIcont';
@@ -72,7 +82,6 @@ class View {
     map.id = 'mapPic';
     UIcont.appendChild(map);
   }
-
   buildBackground(width){
     for (let p = 0; p < 11; p += 1){
       for(let b = 0; b < 3; b += 1) {
@@ -101,6 +110,7 @@ class View {
       }
     }
   }
+  // setting the opening animations
   autoScroll() {
     for (let x = 0; x < 3; x += 1){
       for(let y = 0; y < 11; y += 1) {
@@ -111,20 +121,27 @@ class View {
         }
       view.newPos[x][y] = view.newPos[x][y] - this.moveWeights[y];
       this.background[x][y].style.left = view.newPos[x][y] + 'px';
-      
+      if (this.heroInMotion ===false){
+       this.opening = this.runAnimation(this.animations[0]);
+        this.heroInMotion = true;
+      }
     }
     }
   }
+  // hero animations
   cycleAnimation(mobject){ 
     this.hero.style.left = `-${this.heroFrame  * mobject.width}px`;
     this.heroFrame++;
     if(this.heroFrame < mobject.frames){
       setTimeout(this.cycleAnimation.bind(this,mobject),mobject.timing);
     };
-    console.log(this.heroInMotion);
     if (this.heroFrame > (mobject.frames-1)) {
       this.heroFrame = 0;
+      this.setAnimation(this.animations[1]);
       this.heroInMotion = false;
+      if (mobject.name === 'slash' || 'block') {
+        this.heroCombatMotion = false;
+      } 
     }
   } 
   runAnimation(mobject){
@@ -134,27 +151,24 @@ class View {
  
   setAnimation(mobject){
     this.hero.remove();
-    this.heroBox.style.height = `${mobject.height}px`;
-    this.heroBox.style.width = `${mobject.width}px`;
+    mobject.type.style.height = `${mobject.height}px`;
+    mobject.type.style.width = `${mobject.width}px`;
     this.hero = document.createElement('img');
     this.hero.src = `assets/characterSprite/${mobject.name}.png`;
-    this.hero.style.width = `${(mobject.frames)*mobject.width}px`;
+    this.hero.style.width = `${(mobject.frames) * mobject.width}px`;
     this.hero.style.position= 'absolute';
     this.hero.style.height = `${mobject.height}px`;
     this.heroBox.appendChild(this.hero);
+    if(this.faceLeft === true){
+      this.hero.style.transform= 'scaleX(-1)';
+    }
   }
   detailUI(){
-  }
-  render(){
-    this.scroll = setInterval(this.autoScroll.bind(this), 40);
-    //928 is frame width of the parallaxing background
-    this.buildBackground(928);
-    this.buildUI();
-    this.moveWeightsConstruction();
   }
 
   clearOut(){
     clearInterval(this.scroll);
+    clearTimeout(this.opening);
   }  
   moveRight() {
     if (this.heroCurrentX < 21) {
@@ -163,16 +177,22 @@ class View {
   }
   }
   moveLeft() {
-    // if (this.heroMoving === false) {
     if (this.heroCurrentX > 0) {
     this.heroCurrentX--;
     this.heroBox.style.transform = `translateX(${this.heroCurrentX * 63}px)`;
-    this.hero.style.transform= 'scaleX(-1)';
   }
 }
+render(){
+  this.scroll = setInterval(this.autoScroll.bind(this), 40);
+  //928 is frame width of the parallaxing background
+  this.buildBackground(928);
+  this.buildUI();
+  this.moveWeightsConstruction();
+}
+
 }
 document.onkeydown = function(e){
-  var keycode = window.event ? window.event.keyCode : e.which;
+  let keycode = window.event ? window.event.keyCode : e.which;
   if(keycode == 13){
       // var timer = setTimeout(function(){
       //     alert('Down key held');
@@ -182,41 +202,40 @@ document.onkeydown = function(e){
           view.clearOut();
           document.querySelector('#title').style.transform = 'translateX(-1500px)';
           document.querySelector('#start').style.transform = 'translateX(1500px)'; 
-          
-          
       }
     } else if (keycode === 39) {
       view.clearOut();
-     
+      if (view.heroCombatMotion === false) {
+      view.moveRight();
+      };
       if (view.heroInMotion === false){
-        view.moveRight();
+        view.faceLeft = false;
         view.runAnimation(view.animations[0]);
         view.heroInMotion = true;
-        view.test =true;
       }
   } else if (keycode === 37){
       view.clearOut();
-      
+      if (view.heroCombatMotion === false) {
+      view.moveLeft();   
+      };
       if (view.heroInMotion === false){
-        view.moveLeft();
+        view.faceLeft = true;
         view.runAnimation(view.animations[0]);
         view.heroInMotion = true;
-        view.test = true;
-      
-      }
+      };
     } else if (keycode === 38){
       view.clearOut();
       if (view.heroInMotion === false){
         view.runAnimation(view.animations[2]);
         view.heroInMotion = true;
-        view.test = true;
-    }
+        view.heroCombatMotion = true;
+    };
     } else if (keycode === 40){
       view.clearOut();
       if (view.heroInMotion === false){
         view.runAnimation(view.animations[4]);
         view.heroInMotion = true;
-        view.test = true; 
+        view.heroCombatMotion = true;
   }
     }
   }
