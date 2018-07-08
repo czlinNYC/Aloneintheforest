@@ -15,17 +15,25 @@ class View {
     this.heroBox = document.querySelector('#charContainer');
     this.heroCurrentX = 0;
     this.hero = document.querySelector('#character');
+    this.heroHealthGone = document.querySelector('#healthGone');
+    this.heroHealthFull = document.querySelector('#healthFull');
+    this.heroMoraleFull = document.querySelector('#moraleFull');
+    this.heroMoraleGone = document.querySelector('#moraleGone');
     this.heroFrame = 0;
     this.heroInMotion = false;
     this.heroCombatMotion = false;
     this.test = false;
     this.faceLeft =false;
+    this.heroHealth = 300;
+    this.heroMorale = 300;
+    this.playerDefenseUp = true;
     // enemy variables
     this.enemy = document.querySelector('#enemy');
     this.enemyBox = document.querySelector('#enemyCont');
     this.enemyFaceRight = false;
     this.enemyFrame =0;
     this.enemyCurrentX = 21;
+    this.enemyHealth = 100;
     this.animations = [
       { name: 'walk',
         frames: 8,
@@ -85,15 +93,43 @@ class View {
     healthBar.id = 'health';
     UIcont.appendChild(healthBar);
     healthBar.innerHTML = '<h1>health</h1>';
+    healthBar.style.display = 'flex';
     
     let moraleBar = document.createElement('div');
     moraleBar.id = 'morale';
     UIcont.appendChild(moraleBar);
     moraleBar.innerHTML = '<h1>morale</h1>';
+    moraleBar.style.display = 'flex';
 
     let map =  document.createElement('img');
     map.id = 'mapPic';
     UIcont.appendChild(map);
+
+    for (let i = 0; i < 2; i+=1){
+      let newDiv = document.createElement('div');
+      if(i=== 0 ){
+        newDiv.id = 'healthFull';
+      }else {
+        newDiv.id = 'healthGone';
+      }
+      healthBar.appendChild(newDiv);
+    }
+    for (let i = 0; i < 2; i+=1){
+      let newDiv = document.createElement('div');
+      if(i=== 0 ){
+        newDiv.id = 'moraleFull';
+      }else {
+        newDiv.id = 'moraleGone';
+      }
+      moraleBar.appendChild(newDiv);
+    }
+    this.heroHealthGone = document.querySelector('#healthGone');
+    this.heroHealthFull = document.querySelector('#healthFull');
+    this.heroMoraleFull = document.querySelector('#moraleFull');
+    this.heroMoraleGone = document.querySelector('#moraleGone');
+  }
+  detailUI(){
+    
   }
   buildBackground(width){
     for (let p = 0; p < 11; p += 1){
@@ -123,8 +159,7 @@ class View {
       }
     }
   }
-  detailUI(){
-  }
+ 
   // setting the opening animations
   autoScroll() {
     for (let x = 0; x < 3; x += 1){
@@ -227,8 +262,35 @@ class View {
       this.enemyFaceRight = true;
       this.enemyCurrentX++;
       this.enemyBox.style.transform = `translateX(${this.enemyCurrentX * 63}px)`;
+    } else if(this.enemyCurrentX === this.heroCurrentX - 1 ||this.enemyCurrentX === this.heroCurrentX + 1 ||this.enemyCurrentX === this.heroCurrentX) {
+      this.enemyAttack();
     }
     setTimeout(this.runEnemyAnimation.bind(this,mobject),mobject.timing);
+  }
+  enemyAttack(){
+    if (Math.floor(Math.random() * 85)> 15){
+      this.heroHealth -= Math.floor(Math.random() * 12);
+    }
+    this.updateHealth();
+  }
+  playerAttack(){
+    if (Math.floor(Math.random() * 85)> 15){
+      this.heroHealth -= Math.floor(Math.random() * 12);
+    }
+  }
+  playerBlock(){
+  }
+  updateHealth(){
+    if( this.heroHealth < 0){
+      this.heroHealthFull.style.flex = 0;  
+    }
+    if( this.heroMorale < 0){
+      this.heroMoraleFull.style.flex = 0;  
+    }
+    this.heroHealthFull.style.flex = this.heroHealth;
+    this.heroMoraleFull.style.flex = this.heroMorale;
+    this.heroHealthGone.style.flex = 300 - this.heroHealth;
+    this.heroMoraleGone.style.flex = 300 - this.heroMorale;
   }
   // user input functions
   clearOut(){
