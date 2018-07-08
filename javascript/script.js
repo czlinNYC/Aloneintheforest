@@ -11,7 +11,6 @@ class View {
     this.width = 928;
     this.titleClear = false;
     // hero varibales
-    this.frameSkip = 0;
     this.heroBox = document.querySelector('#charContainer');
     this.heroCurrentX = 0;
     this.hero = document.querySelector('#character');
@@ -26,7 +25,7 @@ class View {
     this.faceLeft =false;
     this.heroHealth = 300;
     this.heroMorale = 300;
-    this.playerDefenseUp = true;
+    this.playerDefenseUp = false;
     // enemy variables
     this.enemy = document.querySelector('#enemy');
     this.enemyBox = document.querySelector('#enemyCont');
@@ -252,7 +251,7 @@ class View {
     }
   }
  
-    
+ // combat functions   
   enemyAi(mobject){
     if(this.enemyCurrentX > this.heroCurrentX+1) {
       this.enemyFaceRight =  false;
@@ -269,16 +268,32 @@ class View {
   }
   enemyAttack(){
     if (Math.floor(Math.random() * 85)> 15){
-      this.heroHealth -= Math.floor(Math.random() * 12);
+      let healthLoss = Math.floor(Math.random() * 12);
+        if (this.heroMorale < 150){
+          healthLoss *= 2;
+        }
+      this.heroHealth -= healthLoss;
+      if (this.playerDefenseUp === false) {
+        this.heroMorale -= (Math.floor(Math.random() * 12)*3);
+      }
     }
     this.updateHealth();
   }
   playerAttack(){
-    if (Math.floor(Math.random() * 85)> 15){
-      this.heroHealth -= Math.floor(Math.random() * 12);
+    if ((this.enemyCurrentX === (this.heroCurrentX + 1) && this.faceLeft === false)||(this.enemyCurrentX === (this.heroCurrentX - 1) && this.faceLeft === true)||(this.enemyCurrentX === this.heroCurrentX)){
+      if (Math.floor(Math.random() * 85)> 15){
+        this.enemyHealth -= Math.floor(Math.random() * 12);
+        this.heroMorale += (Math.floor(Math.random() * 12)*3);
+      }
+      console.log(this.enemyHealth);
     }
   }
+  defenseDown(){
+    this.playerDefenseUp = false;
+  }
   playerBlock(){
+    this.playerDefenseUp = true;
+    setTimeout(this.defenseDown.bind(this),3000);
   }
   updateHealth(){
     if( this.heroHealth < 0){
@@ -319,7 +334,9 @@ render(){
 }
 
 }
+
 document.onkeydown = function(e){
+// got this ternery operator off of w3schools
   let keycode = window.event ? window.event.keyCode : e.which;
   if(keycode == 13){
       // var timer = setTimeout(function(){
@@ -357,6 +374,7 @@ document.onkeydown = function(e){
         view.runAnimation(view.animations[2]);
         view.heroInMotion = true;
         view.heroCombatMotion = true;
+        view.playerAttack();
     };
     } else if (keycode === 40){
       view.clearOut();
@@ -364,6 +382,7 @@ document.onkeydown = function(e){
         view.runAnimation(view.animations[4]);
         view.heroInMotion = true;
         view.heroCombatMotion = true;
+        view.playerBlock();
   }
     }
   }
