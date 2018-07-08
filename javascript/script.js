@@ -15,10 +15,60 @@ class View {
     this.heroBox = document.querySelector('#charContainer');
     this.heroCurrentX = 0;
     this.hero = document.querySelector('#character');
-    this.aniCount = 0;
     this.maps = 0;
     this.titleClear = false;
     this.heroFrame = 0;
+    this.animations = [
+      { name: 'walk',
+        frames: 8,
+        width: 126,
+        height: 126,
+        timing: 80
+      },
+      { name: 'idle',
+        frames: 4,
+        width: 126,
+        height: 126,
+        timing: 120
+      },
+      { name: 'slash',
+        frames: 10,
+        width: 150,
+        height: 120,
+        timing: 80
+      },
+      { name: 'death',
+        frames: 9,
+        width: 126,
+        height: 126,
+        timing: 120
+      },
+      { name: 'block',
+        frames: 7,
+        width: 126,
+        height: 126,
+        timing: 80
+      }];
+
+  }
+  buildUI(){
+    let UIcont = document.createElement('div');
+    UIcont.id ='UIcont';
+    this.mainContainer.appendChild(UIcont);
+    
+    let healthBar = document.createElement('div');
+    healthBar.id = 'health';
+    UIcont.appendChild(healthBar);
+    healthBar.innerHTML = '<h1>health</h1>';
+    
+    let moraleBar = document.createElement('div');
+    moraleBar.id = 'morale';
+    UIcont.appendChild(moraleBar);
+    moraleBar.innerHTML = '<h1>morale</h1>';
+
+    let map =  document.createElement('img');
+    map.id = 'mapPic';
+    UIcont.appendChild(map);
   }
 
   buildBackground(width){
@@ -59,75 +109,50 @@ class View {
         }
       view.newPos[x][y] = view.newPos[x][y] - this.moveWeights[y];
       this.background[x][y].style.left = view.newPos[x][y] + 'px';
-      this.walking()
       }
     }
   }
-  walking(){
-    if (this.frameSkip % 2 === 0) {
-      if (this.hero.style.left === '-882px') {
-        this.aniCount = 0;
-        } else { 
-        this.aniCount -= 126; 
-      } 
-    this.hero.style.left = this.aniCount + 'px'; 
-    }
-    this.frameSkip++;
-  }
-  setIdle(){
-    this.hero.remove();
-    this.hero = document.createElement('img');
-    this.hero.src = 'assets/characterSprite/idle.png';
-    this.hero.style.width = '504px';
-    this.hero.style.position= 'absolute';
-    this.hero.style.height = '126px';
-    this.heroBox.appendChild(this.hero);
-    
-  }
-  idle() {
-    this.hero.style.left = `-${this.heroFrame * 126}px`
+  cycleAnimation(mobject){ 
+    this.hero.style.left = `-${this.heroFrame  * mobject.width}px`;
     this.heroFrame++;
-    if (this.heroFrame > 3) {
+    if (this.heroFrame > (mobject.frames - 1)) {
       this.heroFrame = 0;
     }
+  } 
+  runWalk(mobject){
+    this.setAnimation(mobject);
+    this.con = setInterval(this.cycleWalk.bind(this),mobject.timing);
   }
-  buildUI(){
-    let UIcont = document.createElement('div');
-    UIcont.id ='UIcont';
-    this.mainContainer.appendChild(UIcont);
-    
-    let healthBar = document.createElement('div');
-    healthBar.id = 'health';
-    UIcont.appendChild(healthBar);
-    healthBar.innerHTML = '<h1>health</h1>';
-    
-    let moraleBar = document.createElement('div');
-    moraleBar.id = 'morale';
-    UIcont.appendChild(moraleBar);
-    moraleBar.innerHTML = '<h1>morale</h1>';
-
-    let map =  document.createElement('img');
-    map.id = 'mapPic';
-    UIcont.appendChild(map);
-
+  cycleWalk (){
+    this.cycleAnimation(this.animations[0]);
+  }
+  setWalk(){
+    this.setAnimation(this.animations[0]);
+  }
+  setAnimation(mobject){
+    this.hero.remove();
+    this.heroBox.style.height = `${mobject.height}px`;
+    this.heroBox.style.width = `${mobject.width}px`;
+    this.hero = document.createElement('img');
+    this.hero.src = `assets/characterSprite/${mobject.name}.png`;
+    this.hero.style.width = `${(mobject.frames)*mobject.width}px`;
+    this.hero.style.position= 'absolute';
+    this.hero.style.height = `${mobject.height}px`;
+    this.heroBox.appendChild(this.hero);
   }
   detailUI(){
-  
-
-  }
-  animate(){
-    this.con = setInterval(this.idle.bind(this),120);
   }
   render(){
-    this.con = setInterval(this.autoScroll.bind(this), 40);
+    this.scroll = setInterval(this.autoScroll.bind(this), 40);
     //928 is frame width of the parallaxing background
     this.buildBackground(928);
     this.buildUI();
+    this.runWalk(this.animations[0]);
     this.moveWeightsConstruction();
-    
   }
 
   clearOut(){
+    clearInterval(this.scroll);
     clearInterval(this.con);
   }  
   moveRight() {
@@ -158,15 +183,23 @@ document.onkeydown = function(e){
           document.querySelector('#start').style.transform = 'translateX(1500px)'; 
           view.setIdle();
           view.animate();
+          
       }
-  } else if (keycode === 39) {
-    view.moveRight();
-
+    } else if (keycode === 39) {
+      document.onkeydown = function(){
+      view.clearOut();
+      view.moveRight();
+      view.runWalk(view.animations[0]);
+      }
   } else if (keycode === 37){
-    view.moveLeft();
+      document.onkeydown = function(){
+      view.clearOut();
+      view.moveLeft();
+      view.runWalk(view.animations[0]);
   }
-  
 }
+}
+
 
 const view = new View;
 view.render();
