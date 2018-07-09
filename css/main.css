@@ -104,7 +104,7 @@ h1 { position: absolute;
     overflow: hidden;
     height: 160px;
     width: 160px;
-    top: 380px;
+    top: 360px;
     transition: 1s;
     display: none;
 }

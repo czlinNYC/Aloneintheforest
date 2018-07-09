@@ -10,6 +10,7 @@ class View {
     this.moveWeights = [];
     this.width = 928;
     this.titleClear = false;
+    this.gameOver =false;
     // hero varibales
     this.heroBox = document.querySelector('#charContainer');
     this.heroCurrentX = 0;
@@ -33,7 +34,7 @@ class View {
     this.enemyFaceRight = false;
     this.enemyFrame =0;
     this.enemyCurrentX = 21;
-    this.enemyHealth = 600;
+    this.enemyHealth = 60;
     this.animations = [
       { name: 'walk',
         frames: 8,
@@ -76,6 +77,13 @@ class View {
         
       },
       { name: 'sumwalk',
+        frames: 12,
+        width: 160,
+        height: 160,
+        timing: 240
+      },
+      {
+        name: 'sumdie',
         frames: 12,
         width: 160,
         height: 160,
@@ -206,7 +214,9 @@ class View {
     };
     if (this.heroFrame > (mobject.frames-1)) {
       this.heroFrame = 0;
+      if (this.gameOver=== false){
       this.setAnimation(this.animations[1]);
+      }
       this.heroInMotion = false;
       if (mobject.name === 'slash' || 'block') {
         this.heroCombatMotion = false;
@@ -234,13 +244,10 @@ class View {
   }
   // enemy animation functions
   cycleEnemyAnimation(mobject){ 
-    if (this.enemyFrame < mobject.frames){
-      this.enemyInMotion === true;
-    }
     this.enemy.style.left = `-${this.enemyFrame  * mobject.width}px`;
     this.enemyFrame++;
     if(this.enemyFrame < mobject.frames){
-      setTimeout(this.cycleEnemyAnimation.bind(this,mobject),mobject.timing);
+      this.enemyCycle = setTimeout(this.cycleEnemyAnimation.bind(this,mobject),mobject.timing);
     };
     if (this.enemyFrame > (mobject.frames-1)) {
       this.enemyFrame = 0;
@@ -288,7 +295,10 @@ class View {
     } else if(this.enemyCurrentX === this.heroCurrentX - 1 ||this.enemyCurrentX === this.heroCurrentX + 1 ||this.enemyCurrentX === this.heroCurrentX) {
       this.enemyAttack();
     }
-    setTimeout(this.runEnemyAnimation.bind(this,mobject),mobject.timing);
+    if(this.enemyInMotion === false){
+      this.enemyMove = setTimeout(this.runEnemyAnimation.bind(this,mobject),mobject.timing);
+      this.enemyInMotion = true;
+    }
   }
   
   enemyAttack(){
@@ -326,8 +336,9 @@ class View {
     this.playerDefenseUp = false;
   }
   playerBlock(){
+    clearTimeout(this.block);
     this.playerDefenseUp = true;
-    setTimeout(this.defenseDown.bind(this),3000);
+    this.block = setTimeout(this.defenseDown.bind(this),3000);
   }
   updateHealth(){
     if( this.heroHealth < 0){
@@ -353,12 +364,15 @@ class View {
   }
   checkDeath(){
     if (this.heroHealth < 0){
-      this.heroBox.remove();
+      this.gameOver = true;
+      this.runAnimation(this.animations[3]);
       clearInterval(this.enemyCombat);
     }
     if (this.enemyHealth < 0){
-      this.enemyBox.remove();
+      clearTimeout(this.enemyMove);
       clearInterval(this.enemyCombat);
+      this.runEnemyAnimation(this.animations[6]);
+      
     }
   }
   // user input functions
@@ -406,7 +420,7 @@ document.onkeydown = function(e){
           document.querySelector('#title').style.transform = 'translateX(-1500px)';
           document.querySelector('#start').style.transform = 'translateX(1500px)'; 
       }
-    } else if (keycode === 39) {
+    } else if (keycode === 39 && view.gameOver === false) {
       if (view.heroCombatMotion === false) {
       view.moveRight();
       };
@@ -415,7 +429,7 @@ document.onkeydown = function(e){
         view.runAnimation(view.animations[0]);
         view.heroInMotion = true;
       }
-  } else if (keycode === 37){
+  } else if (keycode === 37 && view.gameOver === false){
       if (view.heroCombatMotion === false) {
       view.moveLeft();   
       };
@@ -424,14 +438,14 @@ document.onkeydown = function(e){
         view.runAnimation(view.animations[0]);
         view.heroInMotion = true;
       };
-    } else if (keycode === 38){
+    } else if (keycode === 38 && view.gameOver === false){
       if (view.heroInMotion === false){
         view.runAnimation(view.animations[2]);
         view.heroInMotion = true;
         view.heroCombatMotion = true;
         view.playerAttack();
     };
-    } else if (keycode === 40){
+    } else if (keycode === 40 && view.gameOver === false){
       if (view.heroInMotion === false){
         view.runAnimation(view.animations[4]);
         view.heroInMotion = true;
