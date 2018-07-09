@@ -398,6 +398,7 @@ class View {
     this.heroBox.remove();
     this.enemyBox.remove();
     document.querySelector('#UIcont').style.display = 'none';
+    document.querySelector('#enemyHealth').style.display = 'none';
     if (this.playerWin === true) {
       document.querySelector('#title').style.transform = 'translateX(0px)';
       document.querySelector('#title').innerHTML = 'YOU WIN.';
