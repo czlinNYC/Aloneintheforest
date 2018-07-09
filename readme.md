@@ -15,9 +15,17 @@ There are many mechanics at play: if a player is above 75% morale he does 2x dam
                                   
 Health and morale bars are simply a div with 2 divs insde and using health values to calculate the flex. 
 
-Glitches: Sorceror animation runs 3 times-5 times on death. no Idea why.
+The game features many different states which are not clearly stated some internal and other for player usage. I relied heavily on booleans to manage these and also feel that at some point I should graphical representations of the states that affect player decision making (defenseup).
+
+Glitches: Sorceror animation runs 3 times-5 times on death. no Idea why. spent 6 hours debugging with no success.
           PLayer death animation glitches out if player dies while in middle of a executing a slash.
           
-Area for improvement: I would like to refactor the code to allow for multiple classes and JS pages. A wall of functions is very disconcerting. Also I would like to rewrite my enemy animation functions as well. MOst of the code in the last 24 hours of project time is poorly written and not very extensible.
+Area for improvement: I would like to refactor the code to allow for multiple classes and JS pages. A wall of functions is very disconcerting. Also I would like to rewrite my enemy animation functions as well. Most of the code in the last 24 hours of project time is poorly written and not very extensible.
 
-Would also like to add other areas of of the game, like random encounters, overhead map, inventory and powerups. 
+Would also like to add other areas of of the game, like random encounters, overhead map, inventory and powerups.
+
+Functions of note: The runAnimation function and its children are especially cool. The autoscroll as well.
+
+Sources: Tenery operator was from w3school tutorial.
+         Game assets are from itch.io, open source.
+         Fonts are from fontmeme.com, free for personal use.
