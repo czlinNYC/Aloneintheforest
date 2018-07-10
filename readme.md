@@ -7,10 +7,10 @@ The background was constructed using 2 2-dimensional arrays, cycled through a fu
 
 The game uses fake collision detection to determine if the enemy/user can be attacked. There are 4 user inputs, left and right to move, up to slash and down to block. A single number which is multiplied by 63px to determine position.
 ## Controls:
-up arrow to slash
-down arrow to block
-left arrow to move left
-right arrow to move right
+###### up arrow to slash
+###### down arrow to block
+###### left arrow to move left
+###### right arrow to move right
 ## There are many mechanics at play 
 ###### if a player is above 75% morale he does 2x damage, to represent good spirits.
 ###### if a player is below 50% health he does 2x damage, to represent desperation.
