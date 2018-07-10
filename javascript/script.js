@@ -411,8 +411,8 @@ class View {
   winLose() {
     this.heroBox.remove();
     this.enemyBox.remove();
-    document.querySelector('#UIcont').style.display = 'none';
-    document.querySelector('#enemyHealth').style.display = 'none';
+    document.querySelector('#UIcont').remove();
+    document.querySelector('#enemyHealth').remove();
     if (this.playerWin === true) {
       document.querySelector('#title').style.transform = 'translateX(0px)';
       document.querySelector('#title').innerHTML = 'you are now alone in the forest';
