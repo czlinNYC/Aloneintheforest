@@ -33,7 +33,7 @@ class View {
     this.enemyFaceRight = false;
     this.enemyFrame = 0;
     this.enemyCurrentX = 21;
-    this.enemyHealth = 600;
+    this.enemyHealth = 400;
     // animations objects to be fed into the runanimation function
     this.animations = [
       {
@@ -377,7 +377,7 @@ class View {
       this.enemyHealthFull.style.flex = 0;
     }
     this.enemyHealthFull.style.flex = this.enemyHealth;
-    this.enemyHealthGone.style.flex = 600 - this.enemyHealth;
+    this.enemyHealthGone.style.flex = 400 - this.enemyHealth;
     this.heroHealthFull.style.flex = this.heroHealth;
     this.heroMoraleFull.style.flex = this.heroMorale;
     this.heroHealthGone.style.flex = 300 - this.heroHealth;
@@ -388,12 +388,12 @@ class View {
   // check if anyone dies and ends game
   checkDeath() {
     if (this.heroHealth < 0) {
+      this.hero.remove();
       this.playerWin = false;
       this.gameOver = true;
       this.faceLeft = false;
       clearTimeout(this.cycle);
       clearInterval(this.enemyCombat);
-      this.hero.remove();
       this.runAnimation(this.animations[3]);
       setTimeout(this.winLose.bind(this), 3000);
     }
@@ -459,7 +459,7 @@ class View {
 document.onkeydown = function (e) {
 // got this ternery operator off of w3schools
   const keycode = window.event ? window.event.keyCode : e.which;
-  if (keycode === 13) {
+  if (keycode === 13 && view.gameOver === false) {
     // var timer = setTimeout(function(){
     //     alert('Down key held');
     //     document.onkeyup = function(){};
