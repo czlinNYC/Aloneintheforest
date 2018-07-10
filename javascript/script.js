@@ -34,6 +34,7 @@ class View {
     this.enemyFrame = 0;
     this.enemyCurrentX = 21;
     this.enemyHealth = 600;
+    // animations objects to be fed into the runanimation function
     this.animations = [
       {
         name: 'walk',
@@ -96,7 +97,7 @@ class View {
     ];
   }
 
-  // building the graphics
+  // building the UI graphics, probably could have been done better
   buildUI() {
     const UIcont = document.createElement('div');
     UIcont.id = 'UIcont';
@@ -110,7 +111,7 @@ class View {
     const enemyHealthBar = document.createElement('div');
     enemyHealthBar.id = 'enemyHealth';
     this.mainContainer.appendChild(enemyHealthBar);
-    enemyHealthBar.innerHTML = '<h1>Sorceror</h1>';
+    enemyHealthBar.innerHTML = '<h1>overly dramatic sorceror</h1>';
     enemyHealthBar.classList.add('hidden');
 
     const moraleBar = document.createElement('div');
@@ -158,6 +159,7 @@ class View {
     this.enemyHealthGone = document.querySelector('#enemyHealthGone');
   }
 
+  // dynamically creates the parallaxing background with 2 dimensional array, one for the
   buildBackground(width) {
     for (let p = 0; p < 11; p += 1) {
       for (let b = 0; b < 3; b += 1) {
@@ -176,6 +178,7 @@ class View {
     }
   }
 
+  // can be easily refactored to take different sizes of background panes
   moveWeightsConstruction() {
     for (let i = 0; i < 11; i += 1) {
       if (i === 0) {
@@ -227,11 +230,13 @@ class View {
     }
   }
 
+  // main function that handles the hero animations
   runAnimation(mobject) {
     this.setAnimation(mobject);
     setTimeout(this.cycleAnimation.bind(this, mobject), mobject.timing);
   }
 
+  // resets the animation sprite sheet to lessen glitching
   setAnimation(mobject) {
     this.heroBox.style.height = `${mobject.height}px`;
     this.heroBox.style.width = `${mobject.width}px`;
@@ -249,7 +254,8 @@ class View {
     }
   }
 
-  // enemy animation functions
+  // enemy animation functions identical almost to player ones... very difficult to refactor into a
+  // a single function
   cycleEnemyAnimation(mobject) {
     this.enemy.style.left = `-${this.enemyFrame * mobject.width}px`;
     this.enemyFrame += 1;
@@ -285,7 +291,7 @@ class View {
     }
   }
 
-  // combat functions
+  // enemy ai just makes the enemy follow and auto attack, nothing special
   enemyAi(mobject) {
     if (this.titleClear === false) {
       this.enemyCurrentX = 24;
@@ -309,6 +315,7 @@ class View {
     }
   }
 
+  // battle calculations, defenseUp/morale mechanic is in this function
   enemyAttack() {
     if (Math.floor(Math.random() * 85) > 15) {
       let healthLoss = Math.floor(Math.random() * 12);
@@ -325,6 +332,7 @@ class View {
     this.updateHealth();
   }
 
+  // all other mechanics are in the player attack one
   playerAttack() {
     if ((this.enemyCurrentX === (this.heroCurrentX + 1) && this.faceLeft === false) || (this.enemyCurrentX === (this.heroCurrentX - 1) && this.faceLeft === true) || (this.enemyCurrentX === this.heroCurrentX)) {
       if (Math.floor(Math.random() * 85) > 15) {
@@ -342,16 +350,19 @@ class View {
     }
   }
 
+  // to be called with a set timeout to represent the defensive buff ending
   defenseDown() {
     this.playerDefenseUp = false;
   }
 
+  // calls the defense down and sets defense up
   playerBlock() {
     clearTimeout(this.block);
     this.playerDefenseUp = true;
     this.block = setTimeout(this.defenseDown.bind(this), 3000);
   }
 
+  // real time updates to health on every attack for player and enemy, called in the attack functions
   updateHealth() {
     if (this.heroHealth < 0) {
       this.heroHealthFull.style.flex = 0;
@@ -374,6 +385,7 @@ class View {
     this.checkDeath();
   }
 
+  // check if anyone dies and ends game
   checkDeath() {
     if (this.heroHealth < 0) {
       this.playerWin = false;
@@ -394,6 +406,7 @@ class View {
     }
   }
 
+  // checks and displays win or loss
   winLose() {
     this.heroBox.remove();
     this.enemyBox.remove();
@@ -401,14 +414,14 @@ class View {
     document.querySelector('#enemyHealth').style.display = 'none';
     if (this.playerWin === true) {
       document.querySelector('#title').style.transform = 'translateX(0px)';
-      document.querySelector('#title').innerHTML = 'YOU WIN.';
+      document.querySelector('#title').innerHTML = 'you are now alone in the forest';
     } else {
       document.querySelector('#title').style.transform = 'translateX(0px)';
-      document.querySelector('#title').innerHTML = 'YOU LOSE.';
+      document.querySelector('#title').innerHTML = 'you have died alone in the forest';
     }
   }
 
-  // user input functions
+  // user input functions, clear out to remove title screen and start the game
   clearOut() {
     clearInterval(this.scroll);
     clearTimeout(this.opening);
@@ -441,7 +454,7 @@ class View {
     this.moveWeightsConstruction();
   }
 }
-
+// handles controls
 document.onkeydown = function (e) {
 // got this ternery operator off of w3schools
   const keycode = window.event ? window.event.keyCode : e.which;
