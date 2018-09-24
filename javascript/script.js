@@ -216,7 +216,7 @@ class View {
     this.hero.style.left = `-${this.heroFrame * mobject.width}px`;
     this.heroFrame += 1;
     if (this.heroFrame < mobject.frames) {
-     this.cycle = setTimeout(this.cycleAnimation.bind(this, mobject), mobject.timing);
+      this.cycle = setTimeout(this.cycleAnimation.bind(this, mobject), mobject.timing);
     }
     if (this.heroFrame > (mobject.frames - 1)) {
       this.heroFrame = 0;
