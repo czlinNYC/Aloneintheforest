@@ -1,3 +1,9 @@
+![Screenshot here](https://github.com/czlinNYC/Aloneintheforest/blob/master/ss.png)
+https://www.youtube.com/watch?v=FwD7lCKHdMo&feature=youtu.be
+
+# Play It
+ https://czlinnyc.github.io/Aloneintheforest/
+
 ## What is Alone in the forest?
 Alone in the forest is a combat game where you fight a sorceror to the death in the forest for the right to be alone in the forest. What it was supposed to be was a sprawling rpg with many actions and choices. Poor planning and time management has made this game what it is today.
 ## Tech involved:
